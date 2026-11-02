@@ -1,67 +1,49 @@
 # Preprocesamiento de imágenes DBT
 
-## Descripción
+Esta carpeta contiene los procedimientos de selección, partición, extracción y preprocesamiento de imágenes de tomosíntesis digital de mama (DBT), utilizados como referencia para el Proyecto Final de Titulación de Ingeniería Biomédica.
 
-Esta carpeta contiene los procedimientos de selección, partición y preparación de los datos correspondientes al conjunto *Breast Cancer Screening Digital Breast Tomosynthesis* (BCS-DBT), utilizado en el Proyecto Final de Titulación de Ingeniería Biomédica.
+Se utiliza el conjunto público **BCS-DBT**, disponible en The Cancer Imaging Archive (TCIA).
 
-El notebook `01_seleccion_y_particion.ipynb` presenta una reconstrucción reproducible del procedimiento metodológico empleado para organizar los conjuntos experimentales balanceado y desbalanceado.
+## Notebooks
 
-La selección generada permite obtener las distribuciones de clases descritas en la tesis, aunque las series y los pacientes seleccionados pueden diferir de los utilizados en los experimentos originales.
+**`01_seleccion_y_particion.ipynb`**
 
-## Conjunto de datos
+Realiza la selección de series y la partición de los datos por paciente, evitando que un mismo paciente aparezca en distintos conjuntos. Construye los escenarios balanceado y desbalanceado y genera seis archivos CSV con las series seleccionadas y las posiciones de los cortes previstos.
 
-Se utiliza el subconjunto de entrenamiento de BCS-DBT, disponible públicamente a través de The Cancer Imaging Archive (TCIA).
+**`02_extraccion_y_preprocesamiento.ipynb`**
 
-Para ejecutar el notebook se requieren los archivos de metadatos:
+Utiliza los CSV generados por el primer notebook para implementar:
 
-- `BCS-DBT-file-paths-train-v2.csv`
-- `BCS-DBT-labels-train-v2.csv`
+- Descarga de series DICOM desde TCIA.
+- Extracción de los cortes seleccionados de cada volumen.
+- Conversión de las imágenes a `float32`.
+- Normalización de las intensidades por su valor máximo.
+- Redimensionamiento a 512 × 512 píxeles.
+- Almacenamiento de imágenes y etiquetas en formato `.npy`.
 
-Estos archivos permiten identificar las series, las categorías diagnósticas, los pacientes y las rutas de acceso a los volúmenes DICOM.
+## Datos necesarios
 
-**Fuente:** [BCS-DBT — The Cancer Imaging Archive](https://www.cancerimagingarchive.net/collection/breast-cancer-screening-dbt/)
+Para ejecutar el primer notebook se requieren los archivos de metadatos de BCS-DBT:
 
-## Selección y partición
+- `BCS-DBT-file-paths-train-v2`
+- `BCS-DBT-labels-train-v2`
 
-Las categorías `Cancer`, `Benign` y `Actionable` se agrupan como clase positiva (1), mientras que `Normal` corresponde a la clase negativa (0).
-
-Inicialmente se seleccionan 916 series positivas y 916 negativas. Posteriormente, se construyen particiones de entrenamiento, validación y prueba mediante una asignación por paciente, evitando que un mismo paciente aparezca en más de una partición.
-
-A partir de estas selecciones se preparan dos escenarios experimentales:
-
-**Escenario balanceado**
-
-| Partición | Negativas | Positivas | Total |
-|---|---:|---:|---:|
-| Entrenamiento | 1600 | 1597 | 3197 |
-| Validación | 200 | 200 | 400 |
-| Prueba | 200 | 200 | 400 |
-
-**Escenario desbalanceado**
-
-| Partición | Negativas | Positivas | Total |
-|---|---:|---:|---:|
-| Entrenamiento | 2178 | 726 | 2904 |
-| Validación | 250 | 84 | 334 |
-| Prueba | 251 | 83 | 334 |
-
-Estas cantidades corresponden a las imágenes bidimensionales previstas según la estrategia de selección de cortes.
+El segundo notebook requiere los seis CSV generados por el primero y acceso a las series DICOM correspondientes. La descarga necesita disponer del identificador `SeriesInstanceUID` de cada serie.
 
 ## Ejecución
 
-1. Descargar los archivos de metadatos de BCS-DBT desde TCIA.
-2. Abrir `01_seleccion_y_particion.ipynb` en Google Colab.
-3. Cargar los archivos de metadatos cuando lo solicite el notebook.
-4. Ejecutar las celdas en orden.
+Los notebooks están preparados para utilizarse en Google Colab y deben ejecutarse en orden.
 
-El notebook comprueba las distribuciones de clases y verifica que no existan pacientes compartidos entre entrenamiento, validación y prueba.
+El segundo notebook tiene la descarga desactivada por defecto mediante `EJECUTAR_DESCARGA = False`. Para procesar imágenes es necesario habilitarla explícitamente.
 
-También genera archivos CSV con las selecciones de series correspondientes a cada escenario.
+También incluye un modo de prueba para procesar una única serie antes de ejecutar conjuntos completos.
 
-## Alcance y limitaciones
+## Reproducibilidad y limitaciones
 
-El notebook implementa la selección de series y la planificación de los cortes que deben extraerse de cada volumen.
+El primer notebook reconstruye el procedimiento de selección y partición, por lo que las series elegidas pueden diferir de las utilizadas en los experimentos originales.
 
-No descarga los volúmenes DICOM ni genera las imágenes procesadas. Estas operaciones corresponden a una etapa posterior del preprocesamiento.
+El segundo notebook proporciona la implementación de descarga y preprocesamiento, pero no se ha verificado mediante la ejecución completa de los conjuntos experimentales.
 
-Por tanto, las cantidades indicadas representan los tamaños previstos de los conjuntos experimentales y no una comprobación de que todas las imágenes hayan sido descargadas y procesadas correctamente.
+La extracción implementada presupone volúmenes DICOM multiframe. Otras organizaciones de archivos pueden requerir adaptaciones.
+
+Las cantidades de imágenes indicadas en la metodología corresponden a las distribuciones planificadas y no deben interpretarse como evidencia de que todas las descargas y extracciones se hayan completado.
