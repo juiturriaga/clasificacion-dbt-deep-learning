@@ -9,7 +9,7 @@ El proyecto estudia la clasificación binaria de imágenes de tomosíntesis digi
 | Carpeta | Contenido |
 |---|---|
 | [`MNIST/`](MNIST/) | Validación conceptual con implementaciones desde cero de perceptrón simple, perceptrón multicapa y CNN sobre los dígitos 3 y 8. |
-| [`preprocesamiento/`](preprocesamiento/) | Notebooks de selección y partición por paciente, descarga de series DICOM, extracción de cortes y preparación de matrices NumPy. |
+| [`preprocesamiento/`](preprocesamiento/) | Notebooks de selección y partición por paciente, descarga de series DICOM, extracción de cortes, preparación de matrices NumPy y análisis complementario mediante FID y entropía de Shannon. |
 | [`modelos/`](modelos/) | Notebooks de entrenamiento y evaluación de DenseNet121, DenseNet201, KNN, Gaussian Naive Bayes y SVM. |
 
 Cada carpeta contiene un README con indicaciones específicas.
@@ -24,6 +24,12 @@ Las imágenes de DBT se agruparon en dos clases: **negativa (0)**, correspondien
 | Desbalanceado | 2904 | 334 | 334 |
 
 Se evaluaron DenseNet121 y DenseNet201 con aprendizaje por transferencia y ajuste fino de las últimas 100 o 200 capas, además de KNN (`k=1`), Gaussian Naive Bayes y SVM con núcleo polinómico de grado 2.
+
+Como análisis complementario de los conjuntos de entrenamiento, se utilizó
+la distancia de Fréchet Inception (FID) para comparar las distribuciones
+de características de las imágenes de la clase positiva de ambos escenarios,
+y la entropía de Shannon para caracterizar la distribución de intensidades
+de las imágenes.
 
 ## Cómo consultar y utilizar el código
 
